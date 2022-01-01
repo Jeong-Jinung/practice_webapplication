@@ -11,10 +11,11 @@ import org.springframework.stereotype.Component;
 import javax.mail.internet.MimeMessage;
 import java.io.InputStream;
 
-@Profile("local")
+@Profile("local") // profile이 local일 경우에만 사용하겠다.
 @Component
 @Slf4j
 public class ConsoleMailSender implements JavaMailSender {
+
     @Override
     public MimeMessage createMimeMessage() {
         return null;

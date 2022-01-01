@@ -10,7 +10,7 @@ import org.springframework.validation.Validator;
 @RequiredArgsConstructor
 public class SignUpFormValidator implements Validator {
 
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -21,6 +21,7 @@ public class SignUpFormValidator implements Validator {
     public void validate(Object target, Errors errors) {
 
         // TODO email, nickname
+        // target이 validation할 객체
         SignUpForm signUpForm = (SignUpForm) target;
 
         if (accountRepository.existsByEmail(signUpForm.getEmail())) {
