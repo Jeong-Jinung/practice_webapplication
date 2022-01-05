@@ -1,6 +1,7 @@
 package com.study.account;
 
 import com.study.domain.Account;
+import com.study.settings.Notifications;
 import com.study.settings.Profile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
@@ -108,5 +109,15 @@ public class AccountService implements UserDetailsService {
         account.setPassword(passwordEncoder.encode(newPassword)); // 객체는 detached 상태
         accountRepository.save(account); // merge
 
+    }
+
+    public void updateNotifications(Account account, Notifications notifications) {
+        account.setStudyCreatedByWeb(notifications.isStudyCreatedByWeb());
+        account.setStudyCreatedByEmail(notifications.isStudyCreatedByEmail());
+        account.setStudyUpdatedByByWeb(notifications.isStudyUpdatedByWeb());
+        account.setStudyUpdatedByByEmail(notifications.isStudyCreatedByEmail());
+        account.setStudyEnrollmentResultByWeb(notifications.isStudyEnrollmentResultByWeb());
+        account.setStudyEnrollmentResultByEmail(notifications.isStudyEnrollmentResultByEmail());
+        accountRepository.save(account);
     }
 }
