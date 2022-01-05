@@ -23,7 +23,7 @@ public class WithAccountSecurityContextFactory implements WithSecurityContextFac
 
         SignUpForm signUpForm = new SignUpForm();
         signUpForm.setNickname(nickname);
-        signUpForm.setEmail(nickname + "dev@gmail.com");
+        signUpForm.setEmail(nickname + ".dev@gmail.com");
         signUpForm.setPassword("12345678");
         accountService.processNewAccount(signUpForm);
 
