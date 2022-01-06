@@ -1,8 +1,8 @@
 package com.study.account;
 
 import com.study.domain.Account;
-import com.study.settings.Notifications;
-import com.study.settings.Profile;
+import com.study.settings.form.Notifications;
+import com.study.settings.form.Profile;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.mail.SimpleMailMessage;
@@ -119,5 +119,11 @@ public class AccountService implements UserDetailsService {
 //        account.setStudyEnrollmentResultByWeb(notifications.isStudyEnrollmentResultByWeb());
 //        account.setStudyEnrollmentResultByEmail(notifications.isStudyEnrollmentResultByEmail());
         accountRepository.save(account);
+    }
+
+    public void updateNickname(Account account, String nickname) {
+        account.setNickname(nickname);
+        accountRepository.save(account); // save할때 merge가 일어난다
+        login(account);
     }
 }
