@@ -1,5 +1,6 @@
 package com.study.settings;
 
+import com.study.account.AccountRepository;
 import com.study.account.AccountService;
 import com.study.domain.Account;
 import com.study.main.CurrentUser;
@@ -38,6 +39,7 @@ public class SettingsController {
     private final AccountService accountService;
     private final ModelMapper modelMapper;
     private final NicknameValidator nicknameValidator;
+    private final AccountRepository accountRepository;
 
     @InitBinder("passwordForm")
     public void initBinder(WebDataBinder webDataBinder) {
@@ -48,7 +50,6 @@ public class SettingsController {
     public void nicknameFormInitBinder(WebDataBinder webDataBinder) {
         webDataBinder.addValidators(nicknameValidator);
     }
-
 
 
     @GetMapping(SETTINGS_PROFILE_URL)
@@ -130,4 +131,26 @@ public class SettingsController {
         return "redirect:" + SETTINGS_ACCOUNT_URL;
     }
 
+    @GetMapping("/email-login")
+    public String emailLoginForm() {
+        return "account/email-login";
+    }
+
+    @PostMapping("/email-login")
+    public String sendEmail(String email, Model model, RedirectAttributes attributes) {
+        Account account = accountRepository.findByEmail(email);
+        if (account != null) {
+            model.addAttribute("error", "유효한 이메일 주소가 아닙니다.");
+            return "account/email-login";
+        }
+
+        if (!account.canSendConfirmEmail()) {
+            model.addAttribute("error", "이메일 로그인은 1시간 뒤에 사용할 수 있습니다.");
+            return "account/email-login";
+        }
+
+        accountService.sendLoginLink(account);
+        attributes.addFlashAttribute("message", "이메일 인증 메일을 발송했습니다.");
+        return "redirect:/email-login";
+    }
 }
