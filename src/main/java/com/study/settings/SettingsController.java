@@ -3,22 +3,20 @@ package com.study.settings;
 import com.study.account.AccountRepository;
 import com.study.account.AccountService;
 import com.study.domain.Account;
+import com.study.domain.Tag;
 import com.study.main.CurrentUser;
-import com.study.settings.form.NicknameForm;
-import com.study.settings.form.Notifications;
-import com.study.settings.form.PasswordForm;
-import com.study.settings.form.Profile;
+import com.study.settings.form.*;
 import com.study.settings.validator.NicknameValidator;
 import com.study.settings.validator.PasswordFormValidator;
+import com.study.tag.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
@@ -36,10 +34,14 @@ public class SettingsController {
     static final String SETTINGS_ACCOUNT_VIEW_NAME = "settings/account";
     static final String SETTINGS_ACCOUNT_URL = "/" + SETTINGS_ACCOUNT_VIEW_NAME;
 
+    static final String SETTINGS_TAGS_VIEW_NAME = "settings/tags";
+    static final String SETTINGS_TAGS_URL = "/" + SETTINGS_TAGS_VIEW_NAME;
+
     private final AccountService accountService;
     private final ModelMapper modelMapper;
     private final NicknameValidator nicknameValidator;
     private final AccountRepository accountRepository;
+    private final TagRepository tagRepository;
 
     @InitBinder("passwordForm")
     public void initBinder(WebDataBinder webDataBinder) {
@@ -118,6 +120,25 @@ public class SettingsController {
         return SETTINGS_ACCOUNT_VIEW_NAME;
     }
 
+    @GetMapping(SETTINGS_TAGS_URL)
+    public String updateTag(@CurrentUser Account account, Model model) {
+        model.addAttribute(account);
+        return SETTINGS_TAGS_VIEW_NAME;
+    }
+
+    @PostMapping("/settings/tags/add")
+    @ResponseBody
+    public ResponseEntity addTag(@CurrentUser Account account, @RequestBody TagForm tagForm) {
+        String title = tagForm.getTagTitle();
+        Tag tag = tagRepository.findByTitle(title).orElseGet(() -> tagRepository.save(Tag.builder()
+                        .title(tagForm.getTagTitle())
+                        .build()));
+
+        accountService.addTag(account, tag);
+        return ResponseEntity.ok().build();
+    }
+
+
     @PostMapping(SETTINGS_ACCOUNT_URL)
     public String updateAccount(@CurrentUser Account account, @Valid NicknameForm nicknameForm, Errors errors,
                                 Model model, RedirectAttributes attributes) {
@@ -153,4 +174,5 @@ public class SettingsController {
         attributes.addFlashAttribute("message", "이메일 인증 메일을 발송했습니다.");
         return "redirect:/email-login";
     }
+
 }
