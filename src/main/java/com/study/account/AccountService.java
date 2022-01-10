@@ -149,4 +149,9 @@ public class AccountService implements UserDetailsService {
         Optional<Account> byId = accountRepository.findById(account.getId());
         return byId.orElseThrow().getTags();
     }
+
+    public void removeTag(Account account, Tag tag) {
+        Optional<Account> byId = accountRepository.findById(account.getId()); // eager fetch , getOne은 필요한 순간에만 불러온다.
+        byId.ifPresent(item -> item.getTags().remove(tag));
+    }
 }
